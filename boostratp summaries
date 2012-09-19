@@ -1,0 +1,46 @@
+listr<-list()
+for(i in 1:307){listr[[i]]=m.lam.boot[[i]][[4]]}
+for(i in 1:122){listr[[307+i]]=m.lam.boot2[[i]][[4]]}
+for(i in 1:300){listr[[307+122+i]]=m.lam.boot3[[i]][[4]]}
+for(i in 1:300){listr[[307+122+300+i]]=m.lam.boot4[[i]][[4]]}
+
+lam.vec<-vector()
+for(i in 1:1029){
+lam.vec<-cbind(lam.vec,listr[[i]])}
+
+res.func<-function(x){
+mean<-mean(x)
+se<-sd(x)
+lcl<-quantile(x,.025)
+ucl<-quantile(x,.975)
+stats<-cbind(mean,se,lcl,ucl)
+return(stats)}
+mmatrix.bootsum<-apply(lam.vec,1,res.func)
+se<-cbind(mmatrix.bootsum[2,])
+
+p.listr<-list()
+for(i in 1:100){p.listr[[i]]=res.list[[i]][[2]]}
+for(i in 1:644){p.listr[[100+i]]=res.list2[[i]][[2]]}
+for(i in 1:200){p.listr[[100+644+i]]=res.list3[[i]][[2]]}
+
+plam.vec<-vector()
+for(i in 1:944){
+plam.vec<-cbind(plam.vec,p.listr[[i]])}
+pmatrix.bootsum<-apply(plam.vec,1,res.func)
+pse<-cbind(pmatrix.bootsum[2,])
+
+
+#for summarizing the LTRE
+listr2<-list()
+for(i in 1:307){listr2[[i]]=m.lam.boot[[i]][[1]]}
+for(i in 1:122){listr2[[307+i]]=m.lam.boot2[[i]][[1]]}
+for(i in 1:300){listr2[[307+122+i]]=m.lam.boot3[[i]][[1]]}
+for(i in 1:300){listr2[[307+122+300+i]]=m.lam.boot4[[i]][[1]]}
+
+
+mltre.summary<-apply(res.boot,1,res.func)[,c(2,7,9,12,13,16)][,c(1,2,4,6,3,5)]
+
+
+
+
+

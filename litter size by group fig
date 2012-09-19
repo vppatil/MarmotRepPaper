@@ -1,0 +1,23 @@
+#litter size by group bar chart
+
+setwd('C:/Users/Vijay/Documents/My Dropbox/thesis stuff/marmot data files')
+litter<-read.csv(file='knownlitters.csv',header=TRUE,sep=',')
+se.func<-function(x){sd(x)/sqrt(length(x))}
+source(file='C:/Users/Vijay/Documents/My Dropbox/thesis stuff/r scripts/superpose.eb.r')
+
+setwd('C:/Users/Vijay/Documents/My Dropbox/thesis stuff/thesis docs/chapter 2')
+
+tiff(file='litterbygroup.tiff',height=6,width=6,units='in',res=300)
+l<-cbind(tapply(litter$N.Litter,litter$Social.Group,mean))
+groups<-c('A','B','C','D','E','F','G','H','I','J')
+row.names(l)=groups
+se.l<-cbind(tapply(litter$N.Litter,litter$Social.Group,se.func))
+l.plot<-barplot(t(l),ylim=c(0,6),tcl=.5,ylab='Mean Litter Size',xlab='Social Group',bty='o')
+superpose.eb(l.plot,t(l),t(se.l))
+abline(h=0)
+box("plot")
+dev.off()
+#anova test for litter size variation between social groups
+
+a<-glm(N.Litter~Social.Group,data=litter,family=gaussian)
+anova(a,test='F')

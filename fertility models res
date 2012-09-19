@@ -1,0 +1,249 @@
+model.names=c('Group','PDO.','PDOlag','Group+PDO.','Group+PDOlag','PDO.+PDOlag',
+'Group+PDO.+PDOlag','Group*PDO.','Group*PDOlag','Group*PDO.+Group*PDOlag','Null')
+model.names=data.frame(model.names)
+ma.match=match(row.names(ma),row.names(model.names))
+ma<-cbind(ma,model.names[ma.match,])
+names(ma)[5]='model'
+
+#first get AIC weights
+Ma.g<-sum(ma$results.weight[grep('Group',ma$model)])
+Ma.pdo<-sum(ma$results.weight[grep('PDO.',ma$model)])
+Ma.pdolag<-sum(ma$results.weight[grep('PDOlag',ma$model)])
+Ma.gxp<-sum(ma$results.weight[grep('Group*PDO.',ma$model,fixed=TRUE)])
+Ma.gxpl<-sum(ma$results.weight[grep('Group*PDOlag',ma$model,fixed=TRUE)])
+Ma.weights<-rbind(Ma.g,Ma.pdo,Ma.pdolag,Ma.gxp,Ma.gxpl)
+
+jpg.match=match(row.names(jpg),row.names(model.names))
+jpg<-cbind(jpg,model.names[jpg.match,])
+names(jpg)[6]='model'
+
+jpg.g<-sum(jpg$results.weight[grep('Group',jpg$model)])
+jpg.pdo<-sum(jpg$results.weight[grep('PDO.',jpg$model)])
+jpg.pdolag<-sum(jpg$results.weight[grep('PDOlag',jpg$model)])
+jpg.gxp<-sum(jpg$results.weight[grep('Group*PDO.',jpg$model,fixed=TRUE)])
+jpg.gxpl<-sum(jpg$results.weight[grep('Group*PDOlag',jpg$model,fixed=TRUE)])
+jpg.weights<-rbind(jpg.g,jpg.pdo,jpg.pdolag,jpg.gxp,jpg.gxpl)
+
+
+jpg2.match=match(row.names(jpg2),row.names(model.names))
+jpg2<-cbind(jpg2,model.names[jpg2.match,])
+names(jpg2)[5]='model'
+
+jpg2.g<-sum(jpg2$results.weight[grep('Group',jpg2$model)])
+jpg2.pdo<-sum(jpg2$results.weight[grep('PDO.',jpg2$model)])
+jpg2.pdolag<-sum(jpg2$results.weight[grep('PDOlag',jpg2$model)])
+jpg2.gxp<-sum(jpg2$results.weight[grep('Group*PDO.',jpg2$model,fixed=TRUE)])
+jpg2.gxpl<-sum(jpg2$results.weight[grep('Group*PDOlag',jpg2$model,fixed=TRUE)])
+jpg2.weights<-rbind(jpg2.g,jpg2.pdo,jpg2.pdolag,jpg2.gxp,jpg2.gxpl)
+
+#now get coefficient estimates
+
+jpg.coef.list<-list()
+jpg2.coef.list<-list()
+ma.coef.list<-list()
+
+ma.pdo<-vector()
+jpg.pdo<-vector()
+jpg2.pdo<-vector()
+
+ma.PDOlag<-vector()
+jpg.PDOlag<-vector()
+jpg2.PDOlag<-vector()
+
+ma.N.group<-vector()
+jpg.N.group<-vector()
+jpg2.N.group<-vector()
+
+ma.N.group.PDO<-vector()
+jpg.N.group.PDO<-vector()
+jpg2.N.group.PDO<-vector()
+
+ma.N.group.PDOlag<-vector()
+jpg.N.group.PDOlag<-vector()
+jpg2.N.group.PDOlag<-vector()
+
+for(i in 1:11){
+	jpg.coef.list[[i]]=cbind(fixef(jpg.list[[i]]))
+	jpg2.coef.list[[i]]=cbind(glm.nb.list[[i]]$coef)
+	ma.coef.list[[i]]=cbind(fixef(ma.list[[i]]))
+if('PDO'%in% row.names(jpg.coef.list[[i]])){
+		jpg.pdo<-c(jpg.pdo,jpg.coef.list[[i]][row.names(jpg.coef.list[[i]])=='PDO'])}else{
+		jpg.pdo<-c(jpg.pdo,0)}
+	if('PDO'%in% row.names(jpg2.coef.list[[i]])){
+		jpg2.pdo<-c(jpg2.pdo,jpg2.coef.list[[i]][row.names(jpg2.coef.list[[i]])=='PDO'])}else{
+		jpg2.pdo<-c(jpg2.pdo,0)}
+	if('PDO'%in% row.names(ma.coef.list[[i]])){
+		ma.pdo<-c(ma.pdo,ma.coef.list[[i]][row.names(ma.coef.list[[i]])=='PDO'])}else{
+		ma.pdo<-c(ma.pdo,0)}
+if('PDOlag'%in% row.names(jpg.coef.list[[i]])){
+		jpg.PDOlag<-c(jpg.PDOlag,jpg.coef.list[[i]][row.names(jpg.coef.list[[i]])=='PDOlag'])}else{
+		jpg.PDOlag<-c(jpg.PDOlag,0)}
+	if('PDOlag'%in% row.names(jpg2.coef.list[[i]])){
+		jpg2.PDOlag<-c(jpg2.PDOlag,jpg2.coef.list[[i]][row.names(jpg2.coef.list[[i]])=='PDOlag'])}else{
+		jpg2.PDOlag<-c(jpg2.PDOlag,0)}
+	if('PDOlag'%in% row.names(ma.coef.list[[i]])){
+		ma.PDOlag<-c(ma.PDOlag,ma.coef.list[[i]][row.names(ma.coef.list[[i]])=='PDOlag'])}else{
+		ma.PDOlag<-c(ma.PDOlag,0)}
+if('N.group'%in% row.names(jpg.coef.list[[i]])){
+		jpg.N.group<-c(jpg.N.group,jpg.coef.list[[i]][row.names(jpg.coef.list[[i]])=='N.group'])}else{
+		jpg.N.group<-c(jpg.N.group,0)}
+	if('N.group'%in% row.names(jpg2.coef.list[[i]])){
+		jpg2.N.group<-c(jpg2.N.group,jpg2.coef.list[[i]][row.names(jpg2.coef.list[[i]])=='N.group'])}else{
+		jpg2.N.group<-c(jpg2.N.group,0)}
+	if('N.group'%in% row.names(ma.coef.list[[i]])){
+		ma.N.group<-c(ma.N.group,ma.coef.list[[i]][row.names(ma.coef.list[[i]])=='N.group'])}else{
+		ma.N.group<-c(ma.N.group,0)}
+if('N.group:PDO'%in% row.names(jpg.coef.list[[i]])){
+		jpg.N.group.PDO<-c(jpg.N.group.PDO,jpg.coef.list[[i]][row.names(jpg.coef.list[[i]])=='N.group:PDO'])}else{
+		jpg.N.group.PDO<-c(jpg.N.group.PDO,0)}
+	if('N.group:PDO'%in% row.names(jpg2.coef.list[[i]])){
+		jpg2.N.group.PDO<-c(jpg2.N.group.PDO,jpg2.coef.list[[i]][row.names(jpg2.coef.list[[i]])=='N.group:PDO'])}else{
+		jpg2.N.group.PDO<-c(jpg2.N.group.PDO,0)}
+	if('N.group:PDO'%in% row.names(ma.coef.list[[i]])){
+		ma.N.group.PDO<-c(ma.N.group.PDO,ma.coef.list[[i]][row.names(ma.coef.list[[i]])=='N.group:PDO'])}else{
+		ma.N.group.PDO<-c(ma.N.group.PDO,0)}
+if('N.group:PDOlag'%in% row.names(jpg.coef.list[[i]])){
+		jpg.N.group.PDOlag<-c(jpg.N.group.PDOlag,jpg.coef.list[[i]][row.names(jpg.coef.list[[i]])=='N.group:PDOlag'])}else{
+		jpg.N.group.PDOlag<-c(jpg.N.group.PDOlag,0)}
+	if('N.group:PDOlag'%in% row.names(jpg2.coef.list[[i]])){
+		jpg2.N.group.PDOlag<-c(jpg2.N.group.PDOlag,jpg2.coef.list[[i]][row.names(jpg2.coef.list[[i]])=='N.group:PDOlag'])}else{
+		jpg2.N.group.PDOlag<-c(jpg2.N.group.PDOlag,0)}
+	if('N.group:PDOlag'%in% row.names(ma.coef.list[[i]])){
+		ma.N.group.PDOlag<-c(ma.N.group.PDOlag,ma.coef.list[[i]][row.names(ma.coef.list[[i]])=='N.group:PDOlag'])}else{
+		ma.N.group.PDOlag<-c(ma.N.group.PDOlag,0)}
+
+
+}
+
+#now the standard errors
+
+jpg.se.list<-list()
+jpg2.se.list<-list()
+ma.se.list<-list()
+
+ma.pdo.se<-vector()
+jpg.pdo.se<-vector()
+jpg2.pdo.se<-vector()
+
+ma.pdolag.se<-vector()
+jpg.pdolag.se<-vector()
+jpg2.pdolag.se<-vector()
+
+ma.N.group.se<-vector()
+jpg.N.group.se<-vector()
+jpg2.N.group.se<-vector()
+
+ma.N.group.se.pdo.se<-vector()
+jpg.N.group.se.pdo.se<-vector()
+jpg2.N.group.se.pdo.se<-vector()
+
+ma.N.group.se.pdolag.se<-vector()
+jpg.N.group.se.pdolag.se<-vector()
+jpg2.N.group.se.pdolag.se<-vector()
+
+library(arm)
+for(i in 1:11){
+	jpg.se.list[[i]]=cbind(se.fixef(jpg.list[[i]]))
+	jpg2.se.list[[i]]=cbind(summary(glm.nb.list[[i]])$coef[,2])
+	ma.se.list[[i]]=cbind(se.fixef(ma.list[[i]]))
+if('PDO'%in% row.names(jpg.se.list[[i]])){
+		jpg.pdo.se<-c(jpg.pdo.se,jpg.se.list[[i]][row.names(jpg.se.list[[i]])=='PDO'])}else{
+		jpg.pdo.se<-c(jpg.pdo.se,0)}
+	if('PDO'%in% row.names(jpg2.se.list[[i]])){
+		jpg2.pdo.se<-c(jpg2.pdo.se,jpg2.se.list[[i]][row.names(jpg2.se.list[[i]])=='PDO'])}else{
+		jpg2.pdo.se<-c(jpg2.pdo.se,0)}
+	if('PDO'%in% row.names(ma.se.list[[i]])){
+		ma.pdo.se<-c(ma.pdo.se,ma.se.list[[i]][row.names(ma.se.list[[i]])=='PDO'])}else{
+		ma.pdo.se<-c(ma.pdo.se,0)}
+if('PDOlag'%in% row.names(jpg.se.list[[i]])){
+		jpg.pdolag.se<-c(jpg.pdolag.se,jpg.se.list[[i]][row.names(jpg.se.list[[i]])=='PDOlag'])}else{
+		jpg.pdolag.se<-c(jpg.pdolag.se,0)}
+	if('PDOlag'%in% row.names(jpg2.se.list[[i]])){
+		jpg2.pdolag.se<-c(jpg2.pdolag.se,jpg2.se.list[[i]][row.names(jpg2.se.list[[i]])=='PDOlag'])}else{
+		jpg2.pdolag.se<-c(jpg2.pdolag.se,0)}
+	if('PDOlag'%in% row.names(ma.se.list[[i]])){
+		ma.pdolag.se<-c(ma.pdolag.se,ma.se.list[[i]][row.names(ma.se.list[[i]])=='PDOlag'])}else{
+		ma.pdolag.se<-c(ma.pdolag.se,0)}
+
+if('N.group'%in% row.names(jpg.se.list[[i]])){
+		jpg.N.group.se<-c(jpg.N.group.se,jpg.se.list[[i]][row.names(jpg.se.list[[i]])=='N.group'])}else{
+		jpg.N.group.se<-c(jpg.N.group.se,0)}
+	if('N.group'%in% row.names(jpg2.se.list[[i]])){
+		jpg2.N.group.se<-c(jpg2.N.group.se,jpg2.se.list[[i]][row.names(jpg2.se.list[[i]])=='N.group'])}else{
+		jpg2.N.group.se<-c(jpg2.N.group.se,0)}
+	if('N.group'%in% row.names(ma.se.list[[i]])){
+		ma.N.group.se<-c(ma.N.group.se,ma.se.list[[i]][row.names(ma.se.list[[i]])=='N.group'])}else{
+		ma.N.group.se<-c(ma.N.group.se,0)}
+
+if('N.group:PDO'%in% row.names(jpg.se.list[[i]])){
+		jpg.N.group.se.pdo.se<-c(jpg.N.group.se.pdo.se,jpg.se.list[[i]][row.names(jpg.se.list[[i]])=='N.group:PDO'])}else{
+		jpg.N.group.se.pdo.se<-c(jpg.N.group.se.pdo.se,0)}
+	if('N.group:PDO'%in% row.names(jpg2.se.list[[i]])){
+		jpg2.N.group.se.pdo.se<-c(jpg2.N.group.se.pdo.se,jpg2.se.list[[i]][row.names(jpg2.se.list[[i]])=='N.group:PDO'])}else{
+		jpg2.N.group.se.pdo.se<-c(jpg2.N.group.se.pdo.se,0)}
+	if('N.group:PDO'%in% row.names(ma.se.list[[i]])){
+		ma.N.group.se.pdo.se<-c(ma.N.group.se.pdo.se,ma.se.list[[i]][row.names(ma.se.list[[i]])=='N.group:PDO'])}else{
+		ma.N.group.se.pdo.se<-c(ma.N.group.se.pdo.se,0)}
+
+if('N.group:PDOlag'%in% row.names(jpg.se.list[[i]])){
+		jpg.N.group.se.pdolag.se<-c(jpg.N.group.se.pdolag.se,jpg.se.list[[i]][row.names(jpg.se.list[[i]])=='N.group:PDOlag'])}else{
+		jpg.N.group.se.pdolag.se<-c(jpg.N.group.se.pdolag.se,0)}
+	if('N.group:PDOlag'%in% row.names(jpg2.se.list[[i]])){
+		jpg2.N.group.se.pdolag.se<-c(jpg2.N.group.se.pdolag.se,jpg2.se.list[[i]][row.names(jpg2.se.list[[i]])=='N.group:PDOlag'])}else{
+		jpg2.N.group.se.pdolag.se<-c(jpg2.N.group.se.pdolag.se,0)}
+	if('N.group:PDOlag'%in% row.names(ma.se.list[[i]])){
+		ma.N.group.se.pdolag.se<-c(ma.N.group.se.pdolag.se,ma.se.list[[i]][row.names(ma.se.list[[i]])=='N.group:PDOlag'])}else{
+		ma.N.group.se.pdolag.se<-c(ma.N.group.se.pdolag.se,0)}
+
+}
+
+ma.beta<-cbind(ma.pdo,ma.PDOlag,ma.N.group,ma.N.group.PDO,ma.N.group.PDOlag)
+jpg.beta<-cbind(jpg.pdo,jpg.PDOlag,jpg.N.group,jpg.N.group.PDO,jpg.N.group.PDOlag)
+jpg2.beta<-cbind(jpg2.pdo,jpg2.PDOlag,jpg2.N.group,jpg2.N.group.PDO,jpg2.N.group.PDOlag)
+
+jpg.w<-jpg$results.weight
+jpg.w<-cbind(jpg.w,jpg.w,jpg.w,jpg.w,jpg.w)
+jpg.avg<-apply(jpg.beta*jpg.w,2,sum)
+ja<-matrix(rep(jpg.avg,11),11,5,byrow=T)
+
+jpg2.w<-jpg2$results.weight
+jpg2.w<-cbind(jpg2.w,jpg2.w,jpg2.w,jpg2.w,jpg2.w)
+jpg2.avg<-apply(jpg2.beta*jpg2.w,2,sum)
+j2a<-matrix(rep(jpg2.avg,11),11,5,byrow=T)
+
+ma.w<-ma$results.weight
+ma.w<-cbind(ma.w,ma.w,ma.w,ma.w,ma.w)
+ma.avg<-apply(ma.beta*ma.w,2,sum)
+maa<-matrix(rep(ma.avg,11),11,5,byrow=T)
+
+ma.se<-cbind(ma.pdo.se,ma.pdolag.se,ma.N.group.se,ma.N.group.se.pdo.se,ma.N.group.se.pdolag.se)
+jpg.se<-cbind(jpg.pdo.se,jpg.pdolag.se,jpg.N.group.se,jpg.N.group.se.pdo.se,jpg.N.group.se.pdolag.se)
+jpg2.se<-cbind(jpg2.pdo.se,jpg2.pdolag.se,jpg2.N.group.se,jpg2.N.group.se.pdo.se,jpg2.N.group.se.pdolag.se)
+
+ma.se.un<-(ma.w*((ma.se^2)+(ma.beta-maa)^2))
+jpg.se.un<-(jpg.w*((jpg.se^2)+(jpg.beta-ja)^2))
+jpg2.se.un<-(jpg2.w*((jpg2.se^2)+(jpg2.beta-j2a)^2))
+
+ma.se.un<-sqrt(apply(ma.se.un,2,sum))
+jpg.se.un<-sqrt(apply(jpg.se.un,2,sum))
+jpg2.se.un<-sqrt(apply(jpg2.se.un,2,sum))
+
+
+b<-sort(jpg$AIC)
+jpg.sort<-jpg[match(b,jpg$AIC),]
+
+
+b<-sort(jpg2$AIC)
+jpg2.sort<-jpg2[match(b,jpg2$AIC),]
+
+
+b<-sort(ma$AIC)
+ma.sort<-ma[match(b,ma$AIC),]
+
+ma.se.un
+
+
+
+
+
+
