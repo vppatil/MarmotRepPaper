@@ -1,0 +1,30 @@
+notes for rep paper
+
+- intro paragraph- 
+	should mirror closing sentence- species in harsh environments can use life history strategies to survive. there is no one ideal strategy. anything weird these species do can be explained away as an adaptive strategy. Understanding how life history and environmental pressures interact is key to predicting population dynamics.
+
+-general comments- need more specific numbers in results. weak vs. moderate support will not come off as compelling. 
+
+need to fix some table formatting
+
+-change discussion of 'only one study showing biennial breeding to reflect wasser and barash- maybe look for murie book at the library
+
+-bootstrapping ci for model-averaged beta- need reference
+-scan bolker book
+
+need to fix transitions between some discussion paragraphs
+
+-fix figure formatting, change one figure to table.
+
+-put in study area and/or social group stuff?
+
+-check lmer
+
+-find results file, rerun just to be sure.
+
+-fix reference to patil et al. in review
+
+
+
+how long does it take oecologia to make a decision?
+
