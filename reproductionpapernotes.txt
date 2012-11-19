@@ -28,3 +28,4 @@ need to fix transitions between some discussion paragraphs
 
 how long does it take oecologia to make a decision?
 
+quick check of glm.nb run in lmer_jpg_boot suggests slightly differnt results from table
