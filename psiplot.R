@@ -1,4 +1,4 @@
-setwd('C:/Users/Vijay/Documents/My Dropbox/thesis stuff/R workspaces')
+setwd('C:/Users/Brad Griffith/Dropbox/thesis stuff/R workspaces')
 #setwd('C:/Documents and Settings/Vijay Patil/Desktop/desktop/My Dropbox/thesis stuff/R workspaces/')
 
 load(file='ch3oikos.RData')
@@ -10,11 +10,11 @@ years<-2000:2004
 years2<-years-.05
 years3<-years+.05
 
-setwd('C:/Users/Vijay/Documents/My Dropbox/thesis stuff/thesis docs/chapter 2')
+setwd('C:/Users/Brad Griffith/Dropbox/thesis stuff/thesis docs/chapter 2/marmotRepPaper')
 #setwd('C:/Documents and Settings/Vijay Patil/Desktop/desktop/My Dropbox/thesis stuff/thesis docs/chapter 2/')
 
 tiff(file='Psiplot.tiff',height=6,width=6,units='in',res=300)
-plot(years,1-Psi.estimates[,2,2],xlab='Year',ylim=c(0,.9),xaxt='n',xlim=c(1999.8,2004.2),tcl=.5,ylab='Probability of breeding',type='o',lwd=1,pch = 16)
+plot(years,1-Psi.estimates[,2,2],xlab='Year',ylim=c(0,.9),xaxt='n',xlim=c(1999.8,2004.2),tcl=.5,ylab=expression(paste('Probability of breeding (',Psi,')',sep='')),type='o',lwd=1,pch = 16)
 lines(years2,1-Psi.estimates[,1,2],lwd=1,lty=2)
 lines(years3,1-Psi.estimates[,1,1],lwd=1,lty=3)
 points(years2,1-Psi.estimates[,1,2],pch=2,lwd=1)
@@ -37,7 +37,7 @@ years=1:5
 years2<-years-.05
 years3<-years+.05
 intervals<-paste(1999:2003,2000:2004,sep=':')
-plot(years2,S.estimates[,1,1],lty=1,xlab='Time Interval',tcl=.5,ylab='Survival Probability',type='o',lwd=1,xaxt='n',ylim=c(.35,1),pch = 16)
+plot(years2,S.estimates[,1,1],lty=1,xlab='Time Interval',tcl=.5,ylab='Apparent Survival Probability (S)',type='o',lwd=1,xaxt='n',ylim=c(.35,1),pch = 16)
 lines(years3,S.estimates[,2,1],lty=2,lwd=1)
 points(years3,S.estimates[,2,1],pch=6,lwd=1)
 
