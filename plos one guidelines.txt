@@ -1,0 +1,151 @@
+marmot paper plos1 manuscript guidelines
+
+#########
+Figures
+#########
+
+I. titles and figure legends of main figures go in main article file
+II. Legends: figure number, short title with max 15 words, in bold type, with sentence at end.
+III. legend text- up to 300 words max
+multi-panel figures- label each panel in the figure with a capital letter. Reference parts separately in the text.
+
+panel labels- 12 point font, arial bold font. tiff layers must be flattened.
+
+legends- describe key message of figure. identify all non-standard symbols and abbreviations.
+
+#################
+File submission:
+#################
+ 
+1) cover letter
+2) manuscript, with tables and figure legends
+3) Figures as separate file.
+
+no copyediting
+
+############
+Cover letter
+#############
+
+1) why the paper is a valuable contribution to the literature
+2) relate study to previously published work
+3) specifies type of article you are submitting.
+4) describes prior interactions with plos
+5) suggest appropriate academic editors
+6) list recommended or opposed reviewers
+
+do not mention publication fees at this time.
+
+########
+Sections
+########
+
+1) Title
+2) Authors
+3) Affiliations
+4) Abstract
+5) Introduction
+...
+
+6) Acknowledgments
+7) References
+8) Figure Legends
+9) Tables
+
+In between- usually
+Materials and methods
+Results
+Discussion
+Conclusions (optional)
+
+#########
+File type
+#########
+
+word, latex, rtf
+
+if word doc contains equations, use compatibility mode to ensure they will stay intact.
+
+#################
+section guidelines
+
+Title: can have both full and short title- only submit with full title
+250 characters or less. Can include species, descriptive and concise
+
+Authors and affiliations
+First names, middle names and initials, last names
+list associated department, university, or organizational affiliation and location, including city, state/province, and country.
+
+Authorship qualifications- should contribute to all of the above.
+1) conception and design of work, acquisition of data, analysis and interpretation
+2) drafting article or revising critically for important intellectual content.
+3) final approval of version to be published.
+
+##############
+abstract
+-contain objectives of study
+-explain how study was done, without methodological detail
+-summarize most important results and significance
+-less than 300 words
+-don't include citations OR abbreviations.
+
+#############
+Introduction
+-background/context
+-importance of problem
+-brief lit review
+-relevant disagreements
+-overall aim of work, #whether that aim was achieved.#!
+
+##############
+Methods
+
+-detailed protocols can go in supporting info.
+-include ethics statements				######!!!!!####
+-if data is in a public database, specify where.
+
+##########
+Results
+
+results and discussion/conclusions can be separate, or combined.
+Explicitly relate to hypotheses.
+
+not contingent on impact, so don't overstate conclusions. 
+
+######
+acknowledgements- where you put people who contributed but not enough to be listed as authors.
+
+#####
+REFERENCES
+#####
+
+-numbered in the order they appear in the text
+-in-text citations indicated by reference numbers in brackets
+-journal abbreviations matching those in ncbi database
+
+--Published papers. 
+Hou WR, Hou YL, Wu GF, Song Y, Su XL, et al. (2011) cDNA, genomic sequence cloning and overexpression of ribosomal protein gene L9 (rpL9) of the giant panda (Ailuropoda melanoleuca). Genet Mol Res 10: 1576-1588.
+Note: Use of a DOI number for the full-text article is acceptable as an alternative to or in addition to traditional volume and page numbers.
+
+Accepted, unpublished papers. Same as above, but “In press” appears instead of the page numbers.
+
+Electronic journal articles. Huynen MMTE, Martens P, Hilderlink HBM (2005) The health impacts of globalisation: a conceptual framework. Global Health 1: 14. Available: http://www.globalizationandhealth.com/content/1/1/14. Accessed 25 January 2012.
+
+Books. Bates B (1992) Bargaining for life: A social history of tuberculosis. Philadelphia: University of Pennsylvania Press. 435 p.
+
+Book chapters Hansen B (1991) New York City epidemics and history for the public. In: Harden VA, Risse GB, editors. AIDS and the historian. Bethesda: National Institutes of Health. pp. 21-28.
+
+##Tables
+- concise title on top. can include citations
+- keep less than one page- larger tables can be supporting information
+
+##Ethics statement
+-full name of relevant ethics committee, associated permit numbers
+-relevant details taken to ameliorate suffering.
+
+##Observation and field studies
+- permits and approvals
+- land ownership
+- animal welfare details.
+
+

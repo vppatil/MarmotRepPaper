@@ -1,0 +1,39 @@
+Marmot paper notes 1/28/2014
+
+Start with discussion
+read through author guidelines first
+
+
+use cover letter as is, except change the bit about oikos and the title.
+Also, the ethics statement is currently contained in the cover letter- make sure it gets to the right place.
+
+
+outline for flow
+
+review abstract, make sure that it maps.
+
+Discussion outline:
+
+Take homes:
+
+Population dynamics are driven by the interaction between life history strategies and environment.
+
+review strength of claims that biennial breeding was based on a single paper.
+
+Transitions between discussion paragraphs
+
+get reference for bootstrap confidence intervals for betas.
+
+check references again
+
+letter, choice of potential reviewers
+
+academic editors:
+Marco Festa-bianchet
+Mark Boyce
+
+Reviewers:
+Ken Armitage, Stephen Dobson, Dominique Allaine, Klaus Hackländer?
+
+
+

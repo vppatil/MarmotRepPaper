@@ -1,0 +1,72 @@
+ipod discussion notes
+
+
+Say breed prob is consistent over time, as evidenced by...
+
+-done.
+
+Ecol constraints para:
+
+Explain and cite life history tradeff
+link fecundity trade off with data
+
+Cost of rep para:
+Explicitly link pdo snow conclusions with previous literature
+
+Marmot comparisons:
+
+Mention that marmot gradient is not evenly studied, hoary marmots are close to being an end member.
+
+Make it clear that eco constraints may be sufficient to explain inter species, maybe inter site scale differences- clarify scale of comparison.
+
+para 2- link climate and ecol constraints, rework wording
+
+change less to weakly- etc. remove qualitative comparisons.
+
+Table notes
+
+PDO lag subscript
+Age- two age classes
+Mother Age- minimum mother age in 
+Group
+Ad. fems
+Time
+Brd. State
+1
+
+Is it clear that it's just females?
+
+Table 2 should be landscape
+poisson overdispersion
+juvs per group- used negative binomial, no random effects
+juvs/female- poisson, social group/social group * pdo random effects
+litter size- gaussian.
+
+Table 3.
+Pdo + PDOlag, psi age
+group effects on psi were supported. survival- brd. state 1.75 delta aic from top model.
+
+Basically- strong pdo effect for survival
+Age effet strongest for psi- weaker support for group, breeding state.
+
+Table 4 summed aic weights
+For S- pdo, breeding state much weaker
+
+Psi- age universal- breeding state next, then group size.
+
+Table 5. -the early model did a decent job predicting number of breeding females in the later dataset.
+
+Table 6- model selection results for juvs/group, juvs/female
+checking to see if there is evidence for reproductive suppression, individual breeding effort differences.
+
+group size (number of non-juveniles in the fall, right?)
+jper group. strong group effect, weaker climate effect.
+jperfemale
+-climate effect was strongest, group was weaker. 
+
+jpergroup- positive effect of group size- more adults, the more babies produced.
+but not more babies per female
+
+negative pdo effect- fewer babies on crappy, early snowmelt years. More babies with previous pdolag positive- longer growing season.
+
+

@@ -1,0 +1,210 @@
+
+#set the dir as marmot data files
+setwd('C:/Users/Vijay/Documents/My Dropbox/thesis stuff/marmot data files')
+#setwd('C:/Documents and Settings/Vijay Patil/Desktop/desktop/My Dropbox/thesis stuff/marmot data files/')
+
+#first test for poisson overdispersion
+library(qcc)
+#compare results using nov09ma and nov09ma2
+setwd('C:/Users/Vijay/Documents/My Dropbox/thesis stuff/marmot data files/')
+nov<-read.csv(file='nov09ma4.csv',header=TRUE,sep=',')
+litter<-read.csv(file='knownlitters2.csv',header=TRUE,sep=',')
+
+pdo.ctr<-litter$PDO-mean(litter$PDO)
+brd.ctr<-litter$ad.fems-mean(litter$ad.fems)
+pdo.pwr<-lm(litter$N.Litter~pdo.ctr)
+brd.pwr<-lm(litter$N.Litter~brd.ctr)
+anova(pdo.pwr)
+pwr.f2.test(u=9,v=41,f2=.333,sig.level=.05)
+citation('pwr')
+install.packages('pwr')
+library(pwr)
+?pwr.f2.test
+
+
+
+#f calculation
+N=length(litter$Social.Group)
+n=tapply(litter$Social.Group,litter$Social.Group,length)
+mu.i<-tapply(litter$N.Litter,litter$Social.Group,mean)
+MU<-mean(litter$N.Litter)
+p.i<-n/N
+sig<-(tapply(litter$N.Litter,litter$Social.Group,var))
+sig<-mean(sig[-c(5,6,10)])
+f=sqrt(sum(p.i*(mu.i-MU)^2)/sig)
+pwr.anova.test(k=10,n=4.2,f=.4,sig=.05)
+
+
+nov<-subset(nov,nov$ad.fems>0)
+qcc.overdispersion.test(nov$juvs)
+qcc.overdispersion.test(nov$Ma)
+qcc.overdispersion.test(litter$N.Litter)
+
+
+AIC.weight<-function(models,results){
+results.weight<-matrix(0,models,1)
+for (i in 1:models) {results.weight[i] = ((exp((-1/2)*(results$AIC[i]-min(results$AIC))))/sum(exp((-1/2)*(results$AIC-min(results$AIC)))))}
+delta.AIC<-matrix(0,models,1)
+for (i in 1:models) {delta.AIC[i] = results$AIC[i]-min(results$AIC)}
+
+results<-cbind(results,delta.AIC,results.weight)
+results
+}
+model.names<-c('N.group+(1|Social.Group)','PDO+(PDO-1|Social.Group)','PDOlag+(1|Social.Group)','N.group+PDO+(PDO-1|Social.Group)',
+'N.group+PDOlag+(1|Social.Group)','PDO+PDOlag+(PDO-1|Social.Group)+(1|Social.Group)','N.group+PDO+PDOlag+(PDO-1|Social.Group)+(1|Social.Group)',
+'N.group*PDO+(PDO-1|Social.Group)+(1|Social.Group)',
+'N.group*PDOlag+(1|Social.Group)','N.group*(PDO+PDOlag)+(PDO-1|Social.Group)+(1|Social.Group)','(1|Social.Group)')
+
+library(lme4)
+#juvs per group, with only PDO slope effects- this is different from in the table
+
+lmer1<-lmer(juvs~N.group+(1|Social.Group),family=poisson,data=nov,na.action=na.omit)
+lmer2<-lmer(juvs~PDO+(PDO-1|Social.Group)+(1|Social.Group),family=poisson,data=nov,na.action=na.omit)
+lmer3<-lmer(juvs~PDOlag+(1|Social.Group),family=poisson,data=nov,na.action=na.omit)
+lmer4<-lmer(juvs~N.group+PDO+(PDO-1|Social.Group)+(1|Social.Group),family=poisson,data=nov,na.action=na.omit)
+lmer5<-lmer(juvs~N.group+PDOlag+(1|Social.Group),family=poisson,data=nov,na.action=na.omit)
+lmer6<-lmer(juvs~PDO+PDOlag+(PDO-1|Social.Group)+(1|Social.Group),family=poisson,data=nov,na.action=na.omit)
+lmer7<-lmer(juvs~N.group+PDO+PDOlag+(PDO-1|Social.Group)+(1|Social.Group),family=poisson,data=nov,na.action=na.omit)
+lmer8<-lmer(juvs~N.group*PDO+(PDO-1|Social.Group)+(1|Social.Group),family=poisson,data=nov,na.action=na.omit)
+lmer9<-lmer(juvs~N.group*PDOlag+(1|Social.Group),family=poisson,data=nov,na.action=na.omit)
+lmer10<-lmer(juvs~N.group*(PDO+PDOlag)+(PDO-1|Social.Group)+(1|Social.Group),family=poisson,data=nov,na.action=na.omit)
+lmer11<-lmer(juvs~(1|Social.Group),family=poisson,data=nov,na.action=na.omit)
+
+jpg.list<-list(lmer1,lmer2,lmer3,lmer4,lmer5,lmer6,lmer7,lmer8,lmer9,lmer10,lmer11)
+aic<-vector()
+k<-vector()
+aic.c<-vector()
+for (i in 1:11){
+	aic[i]=AIC(logLik(jpg.list[[i]]))
+	k[i]=(aic[i]+2*logLik(jpg.list[[i]]))/2
+	aic.c[i]=aic[i]+(2*k[i]*(k[i]+1))/(length(nov$juvs)-k[i]-1)}
+
+models<-paste('jpg.lmer',model.names,sep=':')
+jpg<-data.frame(models,aic.c)
+names(jpg)[2]<-'AIC'
+
+jpg<-AIC.weight(11,jpg)
+
+b<-sort(jpg$AIC)
+jpg.sort<-jpg[match(b,jpg$AIC),]
+
+#now do the negative binomial models
+
+#library(MASS)
+glm.nb1<-glm.nb(juvs~N.group, data=nov,na.action=na.omit)
+glm.nb2<-glm.nb(juvs~PDO, data=nov,na.action=na.omit)
+glm.nb3<-glm.nb(juvs~PDOlag, data=nov,na.action=na.omit)
+glm.nb4<-glm.nb(juvs~N.group+PDO, data=nov,na.action=na.omit)
+glm.nb5<-glm.nb(juvs~N.group+PDOlag, data=nov,na.action=na.omit)
+glm.nb6<-glm.nb(juvs~PDO+PDOlag, data=nov,na.action=na.omit)
+glm.nb7<-glm.nb(juvs~N.group+PDO+PDOlag,data=nov,na.action=na.omit)
+glm.nb8<-glm.nb(juvs~N.group*PDO, data=nov,na.action=na.omit)
+glm.nb9<-glm.nb(juvs~N.group*PDOlag,data=nov,na.action=na.omit)
+glm.nb10<-glm.nb(juvs~N.group*(PDO+PDOlag), data=nov,na.action=na.omit)
+glm.nb11<-glm.nb(juvs~1, data=nov,na.action=na.omit)
+
+aic<-AIC(glm.nb1,glm.nb2,glm.nb3,glm.nb4,glm.nb5,glm.nb6,glm.nb7,glm.nb8,glm.nb9,glm.nb10,glm.nb11)[,2]
+k<-AIC(glm.nb1,glm.nb2,glm.nb3,glm.nb4,glm.nb5,glm.nb6,glm.nb7,glm.nb8,glm.nb9,glm.nb10,glm.nb11)[,1]
+glm.nb.list<-list(glm.nb1,glm.nb2,glm.nb3,glm.nb4,glm.nb5,glm.nb6,glm.nb7,glm.nb8,glm.nb9,glm.nb10,glm.nb11)
+
+aic.c<-vector()
+
+for (i in 1:11){
+	aic.c[i]=aic[i]+(2*k[i]*(k[i]+1))/(length(nov$juvs)-k[i]-1)}
+models<-paste('jpg.nb',1:11,sep='')
+jpg2<-data.frame(models,aic.c)
+names(jpg2)[2]<-'AIC'
+
+jpg2<-AIC.weight(11,jpg2)
+
+b<-sort(jpg2$AIC)
+jpg2.sort<-jpg2[match(b,jpg2$AIC),]
+
+#now Ma: poisson should be adequate
+library(lmer)
+nov2<-subset(nov,nov$ad.fems>0)
+test<-glm(juvs~offset(log(ad.fems))+N.group+(1|Social.Group),family=poisson,data=nov2,na.action=na.omit)
+lmer1<-lmer(juvs~offset(log(ad.fems))+N.group+(1|Social.Group),family=poisson,data=nov2,na.action=na.omit)
+lmer2<-lmer(juvs~offset(log(ad.fems))+PDO+(PDO-1|Social.Group)+(1|Social.Group),family=poisson,data=nov2,na.action=na.omit)
+lmer3<-lmer(juvs~offset(log(ad.fems))+PDOlag+(PDOlag-1|Social.Group)+(1|Social.Group),family=poisson,data=nov2,na.action=na.omit)
+lmer4<-lmer(juvs~offset(log(ad.fems))+N.group+PDO+(PDO-1|Social.Group)+(1|Social.Group),family=poisson,data=nov2,na.action=na.omit)
+lmer5<-lmer(juvs~offset(log(ad.fems))+N.group+PDOlag+(PDOlag-1|Social.Group)+(1|Social.Group),family=poisson,data=nov2,na.action=na.omit)
+lmer6<-lmer(juvs~offset(log(ad.fems))+PDO+PDOlag+(PDO-1|Social.Group)+(PDOlag-1|Social.Group)+(1|Social.Group),family=poisson,data=nov2,na.action=na.omit)
+lmer7<-lmer(juvs~offset(log(ad.fems))+N.group+PDO+PDOlag+(PDO-1|Social.Group)+(PDOlag-1|Social.Group)+(1|Social.Group),family=poisson,data=nov2,na.action=na.omit)
+lmer8<-lmer(juvs~offset(log(ad.fems))+N.group*PDO+(PDO-1|Social.Group)+(1|Social.Group),family=poisson,data=nov2,na.action=na.omit)
+lmer9<-lmer(juvs~offset(log(ad.fems))+N.group*PDOlag+(PDOlag-1|Social.Group)+(1|Social.Group),family=poisson,data=nov2,na.action=na.omit)
+lmer10<-lmer(juvs~offset(log(ad.fems))+N.group*(PDO+PDOlag)+(PDO-1|Social.Group)+(PDOlag-1|Social.Group)+(1|Social.Group),family=poisson,data=nov2,na.action=na.omit)
+lmer11<-lmer(juvs~offset(log(ad.fems))+1+(PDO-1|Social.Group)+(PDOlag-1|Social.Group)+(1|Social.Group),family=poisson,data=nov2,na.action=na.omit)
+
+
+ma.list<-list(lmer1,lmer2,lmer3,lmer4,lmer5,lmer6,lmer7,lmer8,lmer9,lmer10,lmer11)
+aic<-vector()
+k<-vector()
+aic.c<-vector()
+for (i in 1:11){
+	aic[i]=AIC(logLik(ma.list[[i]]))
+	k[i]=(aic[i]+2*logLik(ma.list[[i]]))/2
+	aic.c[i]=aic[i]+(2*k[i]*(k[i]+1))/(length(nov$juvs)-k[i]-1)}
+
+models<-paste('ma.lmer',1:11,sep='')
+ma<-data.frame(models,aic.c)
+names(ma)[2]<-'AIC'
+
+ma<-AIC.weight(11,ma)
+
+b<-sort(ma$AIC)
+ma.sort<-ma[match(b,ma$AIC),]
+litter<-read.csv(file='knownlitters.csv',header=TRUE,sep=',')
+
+
+
+qcc.overdispersion.test(litter$N.Litter)
+
+
+
+brd.glm1<-glm(N.Litter~N.group,data=litter,family=poisson,na.action=na.omit)
+brd.glm2<-glm(N.Litter~PDO,data=litter,family=poisson,na.action=na.omit)
+brd.glm3<-glm(N.Litter~PDOlag,data=litter,family=poisson,na.action=na.omit)
+brd.glm4<-glm(N.Litter~N.group+PDO,data=litter,family=poisson,na.action=na.omit)
+brd.glm5<-glm(N.Litter~N.group+PDOlag,data=litter,family=poisson,na.action=na.omit)
+brd.glm6<-glm(N.Litter~N.group+PDO+PDOlag,data=litter,family=poisson,na.action=na.omit)
+brd.glm7<-glm(N.Litter~N.group*PDO,data=litter,family=poisson,na.action=na.omit)
+brd.glm8<-glm(N.Litter~N.group*PDOlag,data=litter,family=poisson,na.action=na.omit)
+brd.glm9<-glm(N.Litter~N.group*(PDOlag+PDO),data=litter,family=poisson,na.action=na.omit)
+brd.glm10<-glm(N.Litter~mother.age,data=litter,family=poisson,na.action=na.omit)
+brd.glm11<-glm(N.Litter~mother.age+PDO,data=litter,family=poisson,na.action=na.omit)
+brd.glm12<-glm(N.Litter~mother.age+PDOlag,data=litter,family=poisson,na.action=na.omit)
+brd.glm13<-glm(N.Litter~mother.age+PDO+PDOlag,data=litter,family=poisson,na.action=na.omit)
+brd.glm14<-glm(N.Litter~mother.age*(PDO+PDOlag),data=litter,family=poisson,na.action=na.omit)
+brd.glm15<-glm(N.Litter~mother.age*N.group,data=litter,family=poisson,na.action=na.omit)
+brd.glm16<-glm(N.Litter~mother.age*N.group*PDO,data=litter,family=poisson,na.action=na.omit)
+brd.glm17<-glm(N.Litter~1,data=litter,family=poisson,na.action=na.omit)
+
+brd.lmer<-lmer(N.Litter~mother.age+(mother.age|Social.Group),data=litter,na.action=na.omit)
+
+Ma.brd.list<-list(brd.glm1,brd.glm2,brd.glm3,brd.glm4,brd.glm5,brd.glm6,brd.glm7,brd.glm8,brd.glm9,brd.glm10,brd.glm11,brd.glm12,brd.glm13,brd.glm14,brd.glm15,brd.glm16,brd.glm17)
+
+aic<-vector()
+k<-vector()
+aic.c<-vector()
+for (i in 1:17){
+	aic[i]=AIC(logLik(Ma.brd.list[[i]]))
+	k[i]=aic[i]+2*logLik(Ma.brd.list[[i]])
+	aic.c[i]=aic[i]+(2*k[i]*(k[i]+1))/(length(litter$N.Litter)-k[i]-1)}
+
+models<-paste('brd.glm',1:17,sep='')
+Ma.brd<-data.frame(models,aic.c)
+names(Ma.brd)[2]<-'AIC'
+
+Ma.brd<-AIC.weight(17,Ma.brd)
+
+b<-sort(Ma.brd$AIC)
+Ma.brd.sort<-Ma.brd[match(b,Ma.brd$AIC),]
+
+
+#null model is best
+
+litter2<-subset(litter,litter$Year<2007)
+old<-glm(N.Litter~mother.age,data=litter,family=gaussian,na.action=na.omit)
+
+

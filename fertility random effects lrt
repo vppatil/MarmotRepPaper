@@ -1,0 +1,69 @@
+lmer10<-lmer(juvs~offset(log(ad.fems))+N.group*(PDO+PDOlag)+(1|Social.Group),family=poisson,data=nov,na.action=na.omit)
+lmer10.1<-lmer(juvs~offset(log(ad.fems))+N.group*(PDO+PDOlag)+(PDOlag-1|Social.Group)+(1|Social.Group),family=poisson,data=nov,na.action=na.omit)
+lmer10.2<-lmer(juvs~offset(log(ad.fems))+N.group*(PDO+PDOlag)+(PDO-1|Social.Group)+(1|Social.Group),family=poisson,data=nov,na.action=na.omit)
+lmer10.3<-lmer(juvs~offset(log(ad.fems))+N.group*(PDO+PDOlag)+(PDO-1|Social.Group)+(PDOlag-1|Social.Group)+(1|Social.Group),family=poisson,data=nov,na.action=na.omit)
+lmer10.4<-lmer(juvs~offset(log(ad.fems))+N.group*(PDO+PDOlag)+(PDO-1|Social.Group)+(PDOlag-1|Social.Group)+(N.group-1|Social.Group)+(1|Social.Group),family=poisson,data=nov,na.action=na.omit)
+lmer10.5<-lmer(juvs~offset(log(ad.fems))+N.group*(PDO+PDOlag)+(PDO-1|Social.Group)+(N.group-1|Social.Group)+(1|Social.Group),family=poisson,data=nov,na.action=na.omit)
+lmer10.6<-lmer(juvs~offset(log(ad.fems))+N.group*(PDO+PDOlag)+(PDOlag-1|Social.Group)+(N.group-1|Social.Group)+(1|Social.Group),family=poisson,data=nov,na.action=na.omit)
+lmer10.7<-lmer(juvs~offset(log(ad.fems))+N.group*(PDO+PDOlag)+(PDO-1|Social.Group)+(PDOlag-1|Social.Group)+(N.group-1|Social.Group),family=poisson,data=nov,na.action=na.omit)
+
+
+ma.list<-list(lmer10,lmer10.1,lmer10.2,lmer10.3,lmer10.4,lmer10.5,lmer10.6)
+aic<-vector()
+k<-vector()
+aic.c<-vector()
+for (i in 1:7){
+	aic[i]=AIC(logLik(ma.list[[i]]))
+	k[i]=(aic[i]+2*logLik(ma.list[[i]]))/2
+	aic.c[i]=aic[i]+(2*k[i]*(k[i]+1))/(length(nov$juvs)-k[i]-1)}
+
+models<-paste('ma.lmer',1:7,sep='')
+ma<-data.frame(models,aic.c)
+names(ma)[2]<-'AIC'
+
+ma<-AIC.weight(7,ma)
+
+b<-sort(ma$AIC)
+ma.sort<-ma[match(b,ma$AIC),]
+
+anova(lmer10.4,lmer10.5,lmer10.3,lmer10.6)
+no.group<-anova(lmer10.3,lmer10.4)
+no.p<-anova(lmer10.4,lmer10.6)
+no.pl<-anova(lmer10.4,lmer10.5)
+no.int<-anova(lmer10.4,lmer10.7)
+
+
+lmer10<-lmer(juvs~N.group*(PDO+PDOlag)+(1|Social.Group),family=poisson,data=nov,na.action=na.omit)
+lmer10.1<-lmer(juvs~N.group*(PDO+PDOlag)+(PDOlag-1|Social.Group)+(1|Social.Group),family=poisson,data=nov,na.action=na.omit)
+lmer10.2<-lmer(juvs~N.group*(PDO+PDOlag)+(PDO-1|Social.Group)+(1|Social.Group),family=poisson,data=nov,na.action=na.omit)
+lmer10.3<-lmer(juvs~N.group*(PDO+PDOlag)+(PDO-1|Social.Group)+(PDOlag-1|Social.Group)+(1|Social.Group),family=poisson,data=nov,na.action=na.omit)
+lmer10.4<-lmer(juvs~N.group*(PDO+PDOlag)+(PDO-1|Social.Group)+(PDOlag-1|Social.Group)+(N.group-1|Social.Group)+(1|Social.Group),family=poisson,data=nov,na.action=na.omit)
+lmer10.5<-lmer(juvs~N.group*(PDO+PDOlag)+(PDO-1|Social.Group)+(N.group-1|Social.Group)+(1|Social.Group),family=poisson,data=nov,na.action=na.omit)
+lmer10.6<-lmer(juvs~N.group*(PDO+PDOlag)+(PDOlag-1|Social.Group)+(N.group-1|Social.Group)+(1|Social.Group),family=poisson,data=nov,na.action=na.omit)
+lmer10.7<-lmer(juvs~N.group*(PDO+PDOlag)+(PDO-1|Social.Group)+(PDOlag-1|Social.Group)+(N.group-1|Social.Group),family=poisson,data=nov,na.action=na.omit)
+
+ma.list<-list(lmer10,lmer10.1,lmer10.2,lmer10.3,lmer10.4,lmer10.5,lmer10.6)
+aic<-vector()
+k<-vector()
+aic.c<-vector()
+for (i in 1:7){
+	aic[i]=AIC(logLik(ma.list[[i]]))
+	k[i]=(aic[i]+2*logLik(ma.list[[i]]))/2
+	aic.c[i]=aic[i]+(2*k[i]*(k[i]+1))/(length(nov$juvs)-k[i]-1)}
+
+models<-paste('ma.lmer',1:7,sep='')
+ma<-data.frame(models,aic.c)
+names(ma)[2]<-'AIC'
+
+ma<-AIC.weight(7,ma)
+
+b<-sort(ma$AIC)
+ma.sort<-ma[match(b,ma$AIC),]
+
+#first reduction
+anova(lmer10.4,lmer10.5,lmer10.3,lmer10.6)
+no.group<-anova(lmer10.3,lmer10.4)
+no.p<-anova(lmer10.4,lmer10.6)
+no.pl<-anova(lmer10.4,lmer10.5)
+no.int<-anova(lmer10.4,lmer10.7)
+

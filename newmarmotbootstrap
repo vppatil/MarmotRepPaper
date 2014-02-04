@@ -1,0 +1,358 @@
+
+
+# after bootstrap, calculate fertility, also work out survival from year to year
+library(RMark)
+
+#first the resampling across both encounter histories
+
+#load ch2multistate
+
+ch<-adults$ch
+length<-length(ch)
+ch<-strsplit(ch,split='')
+ch2<-matrix(0,length,6)
+for (i in 1:length){ch2[i,]=ch[[i]]}
+brd.dye<-adults$Dye.Pattern
+brd.99<-brd.dye[ch2[,1]=='B']
+brd.00<-brd.dye[ch2[,2]=='B']
+brd.01<-brd.dye[ch2[,3]=='B']
+brd.02<-brd.dye[ch2[,4]=='B']
+brd.03<-brd.dye[ch2[,5]=='B']
+brd.04<-brd.dye[ch2[,6]=='B']
+
+all<-read.csv(file='all.csv',header=TRUE,sep=',')
+all$Age<-ifelse(all$Age>=3,3,all$Age)
+all$brd<-0
+
+nov<-read.csv(file='nov09ma.csv',header=TRUE,sep=',')
+new<-nov[nov$Year>2005,]
+
+num.breed<-xtabs(num.breed~Year,data=new)
+dye.07<-unique(all$ID[all$Year==2007&all$Sex=='Female'&all$Age==3])
+dye.08<-unique(all$ID[all$Year==2008&all$Sex=='Female'&all$Age==3])
+dye.09<-unique(all$ID[all$Year==2009&all$Sex=='Female'&all$Age==3])
+
+#mark marmots from old dataset that bred.
+all$brd[all$ID%in%brd.99&all$Year==1999]=1
+all$brd[all$ID%in%brd.00&all$Year==2000]=1
+all$brd[all$ID%in%brd.01&all$Year==2001]=1
+all$brd[all$ID%in%brd.02&all$Year==2002]=1
+all$brd[all$ID%in%brd.03&all$Year==2003]=1
+all$brd[all$ID%in%brd.04&all$Year==2004]=1
+
+miss.99<-brd.99[brd.99%in%all$ID[all$Year==1999]==FALSE]
+miss.00<-brd.00[brd.00%in%all$ID[all$Year==2000]==FALSE]
+miss.01<-brd.01[brd.01%in%all$ID[all$Year==2001]==FALSE]
+miss.02<-brd.02[brd.02%in%all$ID[all$Year==2002]==FALSE]
+miss.03<-brd.03[brd.03%in%all$ID[all$Year==2003]==FALSE]
+miss.04<-brd.04[brd.04%in%all$ID[all$Year==2004]==FALSE]
+miss<-c(miss.99,miss.00,miss.01,miss.02,miss.03,miss.04)
+sex<-all$Sex[match(miss,all$ID)]
+yr<-c(rep(1999,4),2000,2002)
+sess<-1
+brd=1
+sg<-'None'
+missing<-data.frame(Social.Group=sg,Sex=sex,Age=3,Year=yr,ID=miss,Session=sess,brd=brd)
+
+all<-rbind(all,missing)
+
+
+#try putting this stuff before and after the bootstrap to see if it changes things.
+brd.07<-sample(dye.07,num.breed[1],replace=FALSE)
+brd.08<-sample(dye.08,num.breed[2],replace=FALSE)
+brd.09<-sample(dye.09,num.breed[3],replace=FALSE)
+
+all$brd[all$ID%in%brd.07&all$Year==2007]=1
+all$brd[all$ID%in%brd.08&all$Year==2008]=1
+all$brd[all$ID%in%brd.09&all$Year==2009]=1
+
+all<-read.csv(file='all.csv',header=TRUE,sep=',')
+###################  bootstrap  #######################################
+	
+	newm.boot<-function(all,indices){
+	setwd( "C:/Documents and Settings/hik_lab/My Documents/My Dropbox/thesis stuff/marmot data files")
+	
+	length<-length(all[,1])
+	samp<-1:length
+	indices<-sample(samp,length(samp),replace=TRUE)
+	
+	#all.boot<-all[indices,]
+	all.boot=all
+	all.boot$ID=as.factor(all.boot$ID)
+	new.boot=all.boot[all.boot$Year>2004,]
+	old.boot<-all.boot[all.boot$Year<2005,]
+	
+	#new.boot<-new
+
+	a<-table(new.boot$ID,new.boot$Year,new.boot$Age,new.boot$Sex)
+	a<-ifelse(a>0,1,a)
+	a<-apply(a,c(2,3,4),sum)
+	
+	brd<-subset(new.boot,new.boot$brd==1)
+	num.brd<-table(brd$ID,brd$Year)
+	num.brd<-ifelse(num.brd>0,1,num.brd)
+	num.brd<-apply(num.brd,2,sum)
+	
+	fjuvs<-a[,1,1]
+	ujuvs<-a[,1,3]
+	
+	new.fert<-(fjuvs+(ujuvs/2))/num.brd
+
+	#now make the encounter history
+	
+	rm<-grep('None',new.boot$Social.Group)
+	new.boot<-new.boot[-rm,]	
+
+	ehist.func<-function(x){paste(x,collapse='')}
+	yr1<-subset(new.boot,new.boot$Year==2007)
+	yr2<-subset(new.boot,new.boot$Year==2008)
+	yr3<-subset(new.boot,new.boot$Year==2009)
+
+	t1<-table(yr1$ID,yr1$Session)
+	t2<-table(yr2$ID,yr2$Session)
+	t3<-table(yr3$ID,yr3$Session)
+
+	t<-cbind(t1,t2,t3)
+	t<-ifelse(t>0,1,t)
+
+	ch<-apply(t,1,ehist.func)
+	ch<-cbind(ch[ch!='00000000'])
+	ID<-row.names(ch)
+	sex<-new.boot$Sex[match(ID,new.boot$ID)]
+	Ageatcap<-cbind(tapply(new.boot$Age,new.boot$ID,min))
+	Ageatcap<-Ageatcap[row.names(Ageatcap)%in%ID]
+
+	new.ehist<-data.frame(ID,ch,sex,Ageatcap)
+	new.ehist$ch<-as.character(new.ehist$ch)
+	new.ehist$sex<-as.factor(new.ehist$sex)
+	new.ehist$Ageatcap<-as.factor(new.ehist$Ageatcap)
+	#new.ehist<-subset(new.ehist,new.ehist$sex!='Unknown')
+	
+	
+	agebins<-list(age.bins=c(0,1,2,3,10))
+
+	#now make the processed data
+	newm.proc<-process.data(new.ehist,model='Robust',groups=c('sex','Ageatcap'),age.var=2,initial.ages=c(0,1,2,3),time.intervals=c(0,1,0,1,0,0,0))
+	newm.ddl<-make.design.data(newm.proc,parameters=list(S=agebins,p=agebins,c=agebins),right=FALSE)
+	newm.ddl$c$diff<-0
+	newm.ddl$p$diff<-0
+	newm.ddl$c$diff[newm.ddl$c$session==3]=1
+	newm.ddl$p$diff[newm.ddl$p$session==2]=1
+	newm.ddl$p$diff[newm.ddl$p$session==3]=2
+	newm.ddl$S$ad=0
+	newm.ddl$S$ad[newm.ddl$S$age=='[3,10]']=1
+
+	setwd( "C:/Documents and Settings/hik_lab/Desktop")
+
+	S.ta<-list(formula=~time*age+ad:sex)
+	p.diff<-list(formula=~diff)
+	p.dot<-list(formula=~1)
+	c.diff<-list(formula=~diff)
+	N.dot<-list(formula=~1)
+	#N.all<-list(formula=~time*age)
+	GammaDoublePrime.dot<-list(formula=~1,share=T,fixed=0)
+
+	a<-mark(newm.proc,newm.ddl,model.parameters=list(S=S.ta,p=p.diff,c=c.diff,N=N.dot,GammaDoublePrime=GammaDoublePrime.dot),output=FALSE,adjust=FALSE)
+	res<-collect.models(lx='a')
+	res<-model.average(res,parameter='S',drop=FALSE)
+	j1<-min(res$estimate[res$age==0&res$time==1])
+	j2<-min(res$estimate[res$age==0&res$time==2])
+	y1<-min(res$estimate[res$age==1&res$time==1])
+	y2<-min(res$estimate[res$age==1&res$time==2])
+	t1<-min(res$estimate[res$age==2&res$time==1])
+	t2<-min(res$estimate[res$age==2&res$time==2])
+	a1<-min(res$estimate[res$group=='Female3'&res$time==1])
+	a2<-min(res$estimate[res$group=='Female3'&res$time==2])
+
+	new.surv<-c(j1,j2,y1,y2,t1,t2,a1,a2)
+	#par<-c(new.surv,new.fert)
+	#return(par)
+	
+#making the old marmot encounter history	
+
+setwd( "C:/Documents and Settings/hik_lab/My Documents/My Dropbox/thesis stuff/marmot data files")
+
+old.boot$Age[old.boot$Age>3]=3
+
+a<-table(old.boot$ID,old.boot$Year,old.boot$Age,old.boot$Sex)
+a<-ifelse(a>0,1,a)
+a<-apply(a,c(2,3,4),sum)
+
+old.brd<-subset(old.boot,old.boot$brd==1)
+old.brd<-table(old.brd$ID,old.brd$Year)
+old.brd<-ifelse(old.brd>0,1,old.brd)
+old.brd<-apply(old.brd,2,sum)
+
+fjuvs.old<-a[,1,1]
+ujuvs.old<-a[,3,1]
+
+fert.old<-(fjuvs.old+(ujuvs.old/2))/old.brd
+
+rm.old<-grep('None',old.boot$Social.Group)
+old.boot<-old.boot[-rm.old,]
+
+paste.func<-function(x){paste(x,collapse='')}
+t<-table(old.boot$ID,old.boot$Year)[,1:6]
+t<-ifelse(t>0,1,t)
+ch<-cbind(apply(t,1,paste.func))
+ch<-subset(ch,ch!='000000')
+
+dye<-row.names(ch)
+dye.rows<-match(dye,old.boot$ID)
+sex<-old.boot$Sex[dye.rows]
+group<-old.boot$Social.Group[dye.rows]
+
+Age.cap<-tapply(old.boot$Age,old.boot$ID,min)
+Age.cap<-Age.cap[match(dye,row.names(Age.cap))]
+paste.func<-function(x){paste(x,collapse='')}
+
+dye<-ifelse(dye=='1D','1d',dye)
+dye<-ifelse(dye=='2D','2d',dye)
+dye<-ifelse(dye=='4D','4d',dye)
+dye<-ifelse(dye=='D5','d5',dye)
+dye<-ifelse(dye=='D6','d6',dye)
+dye<-ifelse(dye=='D4','d4',dye)
+dye<-ifelse(dye=='shit','shlt',dye)
+
+shawn<-read.csv(file='dye.csv',header=TRUE,sep=',')
+otherdye<-shawn$x
+
+cap.hist<-data.frame(dye,ch,as.factor(sex),as.factor(Age.cap),as.factor(group),stringsAsFactors=FALSE)
+names(cap.hist)[c(3,4,5)]=c('sex','Age.cap','Social.Group')
+cap.hist2<-subset(cap.hist,cap.hist$sex!='Unknown')
+
+#these are the dye patterns missing from shawn's dataset.
+discrepancy<-cap.hist2$dye[cap.hist2$dye%in% otherdye==FALSE]
+#need to fix this part.
+cap.hist4<-cap.hist2[(cap.hist2$dye %in% discrepancy==FALSE),]
+agebins<-list(age.bins=c(0,1,2,3,10))
+
+marmot.proc<-process.data(cap.hist4,begin.time=1999,model='CJS',groups=c('sex','Age.cap'),age.var=2,initial.ages=c(0,1,2,3))
+marmot.ddl<-make.design.data(marmot.proc,parameters=list(Phi=agebins,p=agebins),right=FALSE)
+
+marmot.ddl$Phi$ad<-0
+marmot.ddl$Phi$ad[marmot.ddl$Phi$age=='[3,10]']=1
+
+Phi.at<-list(formula=~age*time+ad:sex)
+Phi.at2<-list(formula=~age*time)
+
+p.dot<-list(formula=~1)
+
+setwd( "C:/Documents and Settings/hik_lab/Desktop/vijay")
+
+for.ltre<-mark(marmot.proc,marmot.ddl,model.parameters=list(Phi=Phi.at,p=p.dot),output=FALSE,adjust=FALSE)
+old.res<-collect.models(lx='for.ltre')
+old.res<-model.average(old.res,parameter='Phi',drop=FALSE)
+
+marmotjuvs<-for.ltre$results$real[c(1,6:9),1]
+marmotads<-for.ltre$results$real[c(30,2:5),1]
+
+j.s<-vector()
+y.s<-vector()
+t.s<-vector()
+a.s<-vector()
+
+years<-1999:2003
+for(i in 1:5){
+j.s[i]<-min(old.res$estimate[old.res$age==0&old.res$time==years[i]])
+y.s[i]<-min(old.res$estimate[old.res$age==1&old.res$time==years[i]])
+t.s[i]<-min(old.res$estimate[old.res$age==2&old.res$time==years[i]])
+a.s[i]<-min(old.res$estimate[old.res$group=='Female3'&old.res$time==years[i]])}
+
+j.surv<-c(j.s,j1,j2)#[c(1:4,6:7)]
+y.surv<-c(y.s,y1,y2)#[c(1:4,6:7)]
+t.surv<-c(t.s,t1,t2)#[c(1:4,6:7)]
+a.surv<-c(a.s,a1,a2)#[c(1:4,6:7)]
+
+fert<-c(fert.old,new.fert)#[c(1:5,7:8)]
+
+library(popbio)
+source(file="C:/Documents and Settings/hik_lab/My Documents/My Dropbox/thesis stuff/r scripts/leslie.r")
+source(file="C:/Documents and Settings/hik_lab/My Documents/My Dropbox/thesis stuff/r scripts/julian.r")
+
+#need to accomodate the gap properly
+#not done yet.
+
+years=1:7
+forcov<-vector()
+matrices<-list()
+lambda<-vector()
+repv<-matrix(0,7,4)
+stable<-matrix(0,7,4)
+
+for (i in years){
+matrices[[i]]=matrix(0,4,4)
+matrices[[i]][2,1]=j.surv[i]
+matrices[[i]][3,2]=y.surv[i]
+matrices[[i]][4,3]=t.surv[i]
+matrices[[i]][4,4]=a.surv[i]
+matrices[[i]][1,3]=t.surv[i]*fert[i+1]*0.2050039
+matrices[[i]][1,4]=a.surv[i]*fert[i+1]*0.52914165
+repv[i,]=calc_v(matrices[[i]])
+stable[i,]=calc_w(matrices[[i]])
+lambda[i]=calc_lam(matrices[[i]])
+
+}
+
+return(matrices)}
+#return(lambda)}
+
+#lambda bootstrap
+B=1000
+
+m.lam.boot<-list()
+f
+'
+'.or(i in 1:B){m.lam.boot[[i]]<-newm.boot(all)}
+/
+B=1000
+matrices.list<-list()
+
+for (i in 1:B){
+matrices.list[[i]]<-newm.boot(all)}k/ljbjkb/jk
+
+
+
+
+#after you do the bootstrapping for the matrices, you can run the ltre, and build up the bootstrap vector for that.
+#the next step is to make a bootstrapped psi matrix model.
+
+res.boot<-vector()
+for(k in 1:1029){
+years<-c(1,2,3,4,5,6,7)
+matrices=listr2[[k]]
+
+forcov<-vector()
+for (i in years){
+forcov<-cbind(forcov,as.vector(t(matrices[[i]])))}
+forcov<-t(forcov)
+
+
+names<-paste('a',rep(1:4,each=4),rep(1:4,4),sep='')
+colnames(forcov)=names
+x<-order(paste('a',rep(1:4),rep(1:4,each=4),sep=''))
+forcov<-forcov[,x]
+covmat<-cov(forcov)
+#persp(covmat, theta=45, phi=15, box=FALSE,
+#main=expression("Pika Covariances"))
+ w1<- matrix(apply(forcov, 2, mean), nrow=4) 
+wS<-eigen.analysis(w1, zero=FALSE)$sensitivities
+## V matrix of contributions
+contmat <- covmat * c(wS) 
+#persp(contmat, theta=45, phi=15, box=TRUE,
+#main=expression(paste("Contributions to V(", lambda, ")")) )
+A<-matrix(apply(contmat, 2, mean), nrow=4)
+A<-round(A/sum(A),3)
+#A<-c(A)
+#by col
+res<-c(A)
+res.boot<-cbind(res.boot,res)}
+
+mean.cont<-matrix(apply(res.boot,1,mean),nrow=4)
+sd.cont<-matrix(apply(res.boot,1,sd),nrow=4)
+low<-function(x){quantile(x,.025)}
+high<-function(x){quantile(x,.975)}
+low.cont<-matrix(apply(res.boot,1,low),nrow=4)
+high.cont<-matrix(apply(res.boot,1,high),nrow=4)
+
+
