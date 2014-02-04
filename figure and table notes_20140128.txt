@@ -1,0 +1,30 @@
+Marmot paper 2 figure notes
+###########################################################
+Figure 1.
+Psi -probability of movement into the breeding group in the current year, given previous state
+
+- take homes
+1) Big difference between first-year breeders and older marmots- not too surprising
+2) no detectable differences between older marmots that bred last year and those that didn't
+3) Probability of breeding for older marmots was stable- around 50 %
+4) probability of breeding for first timers was more variable, around 20-25%
+
+########################################################
+Figure 2. -apparent survival probability across years for breeders and non-breeders
+
+Take home message
+- accelerating decline in survivorship for adult females over the course of the study period
+- significantly lower survival probability by the final years
+- estimates are contingent on assuming that survivorship is constant.
+- no difference between breeder and non-breeder females
+- note that this means they bred during the first season in each interval.
+
+Breeder/non-breeder not explicitly defined here- maybe put in the figure legend just in case.
+##########################################################
+Figure 3. Body condition index for Breeders vs. non breeders (females)
+- note that there is a significant difference in slope between the two
+- maybe that could be added in
+- julian day 140 - 240 reflects may 20 to august 28, approximately
+
+take home- lots of noise- but by end of growing season non-breeders are significantly heavier proportional to skeletal traits
+interpretation is that they are in significantly better body condition
