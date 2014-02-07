@@ -1,6 +1,3 @@
-library(RMark)
-source('julian.R')
-load('ch3oikos.RData')
 a<-adults.proc$data$ch
 b<-adults.proc$data$Dye.Pattern
 a<-strsplit(a,split='')
@@ -42,6 +39,7 @@ cap$brd[cap$Year==2003&cap$b03==1]=1
 cap$brd[cap$Year==2004&cap$b04==1]=1
 cap$brd<-as.factor(cap$brd)
 
+source(file="C:/Users/Vijay/Documents/My Dropbox/thesis stuff/r scripts/julian.r")
 c99<-subset(cap,cap$Year==1999)
 c00<-subset(cap,cap$Year==2000)
 c01<-subset(cap,cap$Year==2001)
@@ -90,7 +88,5 @@ legend(145,-2.3,legend=c('Non-Breeders','Breeders'),pch=c(15,6),lty=c(1,2),bty='
  
  summary(a)
  summary(b)
-cap$brd<-factor(cap$brd)
-cap<-na.omit(cap)
- c<-glm((cond)~jdate*brd,data=cap,na.action=na.omit)
+ c<-glm(log(cond)~jdate*brd,data=cap)
  
